@@ -5,3 +5,6 @@ class Enemy:
         self.defense = defense
         self.hp = hp
         self.prof = prof
+
+    def damage(self, damage):
+        self.hp -= damage

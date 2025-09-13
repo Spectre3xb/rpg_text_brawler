@@ -13,3 +13,7 @@ class Player:
         self.defense += 5
         self.cons += 5
         self.prof += 5
+        self.hp = self.cons * 100
+
+    def damage(self, damage):
+        self.hp -= damage

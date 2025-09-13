@@ -1,11 +1,11 @@
 import random
 import subprocess
 import os
+
 from player import Player
 from enemies import Enemy
 
 
-game = True
 weapon_dict = {
     0 : ("Fists", 10),
     1 : ("Vibro Knife", 20),
@@ -20,8 +20,8 @@ weapon_dict = {
 }
 
 enemy_list = [
-    ("Stormtrooper", 2, 2, 20, 2),
-    ("Redshirt", 4, 4, 30, 3)
+    ("Stormtrooper", 2, 2, 200, 2),
+    ("Redshirt", 4, 4, 300, 3)
 ]
 
 def clear_screen():
@@ -32,13 +32,6 @@ def initialize_player():
     name = input("Hello there. Would you care to tell me your name? ")
     clear_screen()
     return name
-
-def interface(player, opponent):
-    print(f"Your opponent is {opponent.name}")
-    print("Your choice of weapons:")
-    for weapon in player.weapons:
-        print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
-
 
 def print_stats(player):
     print(f"{player.name} current stats:")
@@ -59,19 +52,47 @@ def intro():
     If you can defeat the final enemy, you will be crowned the new Emperor of the Galaxy!
     """)
 
+def calculate_damage(weapon_base_damage):
+    return weapon_base_damage + random.randint(1, 20)
+
+
+def play(player, opponent):
+    while opponent.hp > 0:
+        clear_screen()
+        print(f"Your opponent is {opponent.name}, {opponent.hp} HP")
+        print("Your choice of weapons:")
+        for weapon in player.weapons:
+            print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
+        while True:
+            try:
+                weapon_choice = int(input(">"))
+                if weapon_choice in player.weapons:
+                    break
+                print("Invalid choice. Try again.")
+            except ValueError:
+                print("Please enter a number.")
+        weapon_base_damage = weapon_dict[weapon_choice][1]
+        damage = calculate_damage(weapon_base_damage)
+        opponent.damage(damage)
+        print(f"{opponent.name} has taken {damage} damage.")
+        print(f"{opponent.name} has {opponent.hp} HP left.")
+        input("Press ENTER to continue...")
+
+
+
 
 def main():
     clear_screen()
     intro()
     input("Press ENTER to continue...")
     clear_screen()
-    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5, weapons = [0])
+    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5, weapons = [0, 1, 5, 7, 8, 9])
     print_stats(player)
     input("Press ENTER to continue...")
     clear_screen()
     for enemy in enemy_list:
         opponent = Enemy(enemy[0], enemy[1], enemy[2], enemy[3], enemy[4])
-        interface(player, opponent)
+        play(player, opponent)
 
 
 
