@@ -20,12 +20,12 @@ weapon_dict = {
 }
 
 enemy_list = [
-    ("Stormtrooper", 2, 2, 200, 2),
+    ("Stormtrooper", 2, 20, 200, 2),
     ("Redshirt", 4, 4, 300, 3)
 ]
 
 def clear_screen():
-    subprocess.call("cls" if os.name == "nt" else "clear", shell=True)
+    subprocess.call("cls" if os.name == "nt" else "clear", shell = True)
 
 
 def initialize_player():
@@ -55,11 +55,16 @@ def intro():
 def calculate_damage(weapon_base_damage):
     return weapon_base_damage + random.randint(1, 20)
 
+def hit(proficiency, difficulty):
+    return proficiency * random.randint(1, 20) > difficulty * 10
 
-def play(player, opponent):
+
+
+def fight(player, opponent):
     while opponent.hp > 0:
         clear_screen()
-        print(f"Your opponent is {opponent.name}, {opponent.hp} HP")
+        print(f"Your opponent is {opponent.name}, {opponent.hp} HP, {opponent.defense} defense.")
+        print(f"Your HP is: {player.hp}")
         print("Your choice of weapons:")
         for weapon in player.weapons:
             print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
@@ -71,12 +76,29 @@ def play(player, opponent):
                 print("Invalid choice. Try again.")
             except ValueError:
                 print("Please enter a number.")
-        weapon_base_damage = weapon_dict[weapon_choice][1]
-        damage = calculate_damage(weapon_base_damage)
-        opponent.damage(damage)
-        print(f"{opponent.name} has taken {damage} damage.")
-        print(f"{opponent.name} has {opponent.hp} HP left.")
+        if hit(player.prof, weapon_choice):
+            print("Your hit landed")
+            damage = calculate_damage(weapon_dict[weapon_choice][1]) - opponent.defense
+            if damage < 0:
+                damage = 0
+            opponent.damage(damage)
+            print(f"{opponent.name} has taken {damage} damage.")
+            print(f"{opponent.name} has {opponent.hp} HP left.")
+            input("Press ENTER to continue...")
+            continue
+        print("You hit yourself")
+        damage = calculate_damage(weapon_dict[weapon_choice][1]) - player.defense
+        if damage < 0:
+            damage = 0
+        player.damage(damage)
+        print(f"You have taken {damage} damage.")
+        print(f"{player.name} has {player.hp} HP left.")
         input("Press ENTER to continue...")
+        if player.hp <= 0:
+            return
+    player.level_up()
+    print_stats(player)
+    input("Press ENTER to continue...")
 
 
 
@@ -86,13 +108,16 @@ def main():
     intro()
     input("Press ENTER to continue...")
     clear_screen()
-    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5, weapons = [0, 1, 5, 7, 8, 9])
+    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5, weapons = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     print_stats(player)
     input("Press ENTER to continue...")
     clear_screen()
     for enemy in enemy_list:
         opponent = Enemy(enemy[0], enemy[1], enemy[2], enemy[3], enemy[4])
-        play(player, opponent)
+        fight(player, opponent)
+        if player.hp <= 0:
+            break
+    print("YOU DIED")
 
 
 
