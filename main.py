@@ -2,29 +2,42 @@ import random
 import subprocess
 import os
 from player import Player
+from enemies import Enemy
 
 
 game = True
 weapon_dict = {
-    1 : ("Fists", 10, 0),
-    2 : ("Vibro Knife", 20, 50),
-    3 : ("Blaster Pistol", 30, 100),
-    4 : ("Type II Phaser", 45, 150),
-    5 : ("Vibroblade", 60, 175),
-    6 : ("Bat'leth", 75, 200),
-    7 : ("Blaster Rifle", 100, 250),
-    8 : ("Type III Phaser", 150, 300),
-    9 : ("Lightsaber", 500, 1000)
+    0 : ("Fists", 10),
+    1 : ("Vibro Knife", 20),
+    2 : ("Blaster Pistol", 30),
+    3 : ("Type II Phaser", 45),
+    4 : ("Vibroblade", 60),
+    5 : ("Bat'leth", 75),
+    6 : ("Blaster Rifle", 100),
+    7 : ("Type III Phaser", 150),
+    8 : ("Disruptor", 250),
+    9 : ("Lightsaber", 500)
 }
+
+enemy_list = [
+    ("Stormtrooper", 2, 2, 20, 2),
+    ("Redshirt", 4, 4, 30, 3)
+]
 
 def clear_screen():
     subprocess.call("cls" if os.name == "nt" else "clear", shell=True)
+
 
 def initialize_player():
     name = input("Hello there. Would you care to tell me your name? ")
     clear_screen()
     return name
 
+def interface(player, opponent):
+    print(f"Your opponent is {opponent.name}")
+    print("Your choice of weapons:")
+    for weapon in player.weapons:
+        print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
 
 
 def print_stats(player):
@@ -48,11 +61,18 @@ def intro():
 
 
 def main():
+    clear_screen()
     intro()
     input("Press ENTER to continue...")
     clear_screen()
-    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5)
+    player = Player(initialize_player(), attack = 5, defense = 5, cons = 5, prof = 5, weapons = [0])
     print_stats(player)
+    input("Press ENTER to continue...")
+    clear_screen()
+    for enemy in enemy_list:
+        opponent = Enemy(enemy[0], enemy[1], enemy[2], enemy[3], enemy[4])
+        interface(player, opponent)
+
 
 
 main ()
