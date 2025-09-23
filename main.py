@@ -118,7 +118,7 @@ def main():
         fight(player, opponent)
         if player.hp <= 0:
             break
-    print("YOU DIED")
+    print("Game Over")
 
 
 
