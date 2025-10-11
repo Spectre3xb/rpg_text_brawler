@@ -59,34 +59,31 @@ def calculate_damage(weapon_base_damage):
 def hit(proficiency, difficulty):
     return proficiency * random.randint(1, 20) > difficulty * 10
 
-
-
-def fight(player, opponent):
-    while opponent.hp > 0:
-        clear_screen()
-        print(f"Your opponent is {opponent.name}, {opponent.hp} HP, {opponent.defense} defense.")
-        print(f"Your HP is: {player.hp}")
-        print("Your choice of weapons:")
-        for weapon in player.weapons:
-            print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
-        while True:
-            try:
-                weapon_choice = int(input(">"))
-                if weapon_choice in player.weapons:
-                    break
-                print("Invalid choice. Try again.")
-            except ValueError:
-                print("Please enter a number.")
-        if hit(player.prof, weapon_choice):
-            print("Your hit landed")
-            damage = calculate_damage(weapon_dict[weapon_choice][1]) - opponent.defense
-            if damage < 0:
-                damage = 0
-            opponent.damage(damage)
-            print(f"{opponent.name} has taken {damage} damage.")
-            print(f"{opponent.name} has {opponent.hp} HP left.")
-            input("Press ENTER to continue...")
-            continue
+def your_turn(player, opponent):
+    clear_screen()
+    print(f"Your opponent is {opponent.name}, {opponent.hp} HP, {opponent.defense} defense.")
+    print(f"Your HP is: {player.hp}")
+    print("Your choice of weapons:")
+    for weapon in player.weapons:
+        print(f"[ {weapon} ] {weapon_dict[weapon][0]}")
+    while True:
+        try:
+            weapon_choice = int(input(">"))
+            if weapon_choice in player.weapons:
+                break
+            print("Invalid choice. Try again.")
+        except ValueError:
+            print("Please enter a number.")
+    if hit(player.prof, weapon_choice):
+        print("Your hit landed")
+        damage = calculate_damage(weapon_dict[weapon_choice][1]) - opponent.defense
+        if damage < 0:
+            damage = 0
+        opponent.damage(damage)
+        print(f"{opponent.name} has taken {damage} damage.")
+        print(f"{opponent.name} has {opponent.hp} HP left.")
+        input("Press ENTER to continue...")
+    else:
         print("You hit yourself")
         damage = calculate_damage(weapon_dict[weapon_choice][1]) - player.defense
         if damage < 0:
@@ -95,11 +92,49 @@ def fight(player, opponent):
         print(f"You have taken {damage} damage.")
         print(f"{player.name} has {player.hp} HP left.")
         input("Press ENTER to continue...")
+
+
+def opponent_turn(player, opponent):
+    clear_screen()
+    print(f"{opponent.name} is attacking!")
+    print(f"Your HP is: {player.hp}")
+    input("Press ENTER to see the attack...")
+
+    weapon_choice = min(opponent.prof, 9)
+
+    if hit(opponent.prof, weapon_choice):
+        print(f"{opponent.name}'s attack landed!")
+        damage = calculate_damage(weapon_dict[weapon_choice][1]) - player.defense
+        if damage < 0:
+            damage = 0
+        player.damage(damage)
+        print(f"You have taken {damage} damage.")
+        print(f"You have {player.hp} HP left.")
+        input("Press ENTER to continue...")
+    else:
+        print(f"{opponent.name} hit themselves in confusion!")
+        damage = calculate_damage(weapon_dict[weapon_choice][1]) - opponent.defense
+        if damage < 0:
+            damage = 0
+        opponent.damage(damage)
+        print(f"{opponent.name} has taken {damage} damage.")
+        print(f"{opponent.name} has {opponent.hp} HP left.")
+        input("Press ENTER to continue...")
+
+
+def fight(player, opponent):
+    while opponent.hp > 0:
+        your_turn(player, opponent)
+        if opponent.hp <= 0:
+            break
+        opponent_turn(player, opponent)
         if player.hp <= 0:
             return
     player.level_up()
+    clear_screen()
     print_stats(player)
     input("Press ENTER to continue...")
+
 
 
 
