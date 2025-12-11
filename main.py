@@ -22,7 +22,8 @@ weapon_dict = {
 enemy_list = [
     ("Stormtrooper", 2, 20, 200, 2),
     ("Redshirt", 4, 4, 300, 3),
-    ("War Droid", 6, 6, 400, 4)
+    ("War Droid", 6, 6, 400, 4),
+    ("Romulan Cadet", 9, 15, 600, 5)
 ]
 
 def clear_screen():
